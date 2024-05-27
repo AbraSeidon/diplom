@@ -7,8 +7,17 @@
     <a href="/signup">sign up</a>
     <a href="/login">log in</a>
 {:else}
-    <p>hello, {data.user.email}</p>
-    <p>your email is {data.user.email_verified ? 'verified' : 'not verified'}</p>
+    <div>
+        <p>hello, {data.user.email}</p>
+    </div>
+    <div>    
+        <p>your email is {data.user.email_verified ? 'verified' : 'not verified'}</p>
+        {#if !data.user.email_verified}
+            <form action="/email-verification" method="POST">
+                <button type="submit">Send verification mail</button>
+            </form>
+        {/if}
+    </div>
     <form action="/logout" method="POST">
         <button type="submit">log out</button>
     </form>

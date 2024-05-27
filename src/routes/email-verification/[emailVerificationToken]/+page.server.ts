@@ -6,6 +6,10 @@ import { isWithinExpirationDate } from "oslo";
 
 export const load: PageServerLoad = async (event) => {
 
+    if(event.locals.user?.email_verified) {
+        error(404, "your email is already verified");
+    }
+
     const emailVerificationToken = event.params.emailVerificationToken;
 
     const existingEmailVerificationToken = await prisma.emailVerificationToken.findUnique({
@@ -35,6 +39,14 @@ export const load: PageServerLoad = async (event) => {
     })
 
     await lucia.invalidateUserSessions(existingUser!.id);
+    await prisma.user.update({
+        where: {
+            id: existingUser!.id,
+        },
+        data: {
+            email_verified: true,
+        }
+    });
 
     const session = await lucia.createSession(existingUser!.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
