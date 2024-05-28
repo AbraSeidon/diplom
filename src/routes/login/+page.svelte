@@ -13,3 +13,4 @@
 	{/if}
 	<button>Continue</button>
 </form>
+<a href="/reset-password">Forgot the password</a>

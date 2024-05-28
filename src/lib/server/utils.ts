@@ -13,7 +13,7 @@ export async function createEmailVerificationToken(email: string): Promise<strin
 		where :{
 			userEmail: email,
 		}
-	})
+	});
 
 	const emailVerificationToken = generateIdFromEntropySize(20);
 	await prisma.emailVerificationToken.create({
@@ -22,10 +22,30 @@ export async function createEmailVerificationToken(email: string): Promise<strin
 			userEmail: email,
 			expiresAt: createDate(new TimeSpan(2, 'h')),
 		}
-	})
+	});
 
-	return emailVerificationToken
+	return emailVerificationToken;
 }
+
+export async function createPasswordResetToken(userId: string): Promise<string> {
+	await prisma.passwordResetToken.deleteMany({
+		where :{
+			userId: userId,
+		}
+	});
+
+	const passwordResetToken = generateIdFromEntropySize(20);
+	await prisma.passwordResetToken.create({
+		data: {
+			id: passwordResetToken,
+			userId: userId,
+			expiresAt: createDate(new TimeSpan(2, 'h')),
+		}
+	});
+
+	return passwordResetToken;
+}
+
 
 export function createNodemailerTransport() {
 	const transporter = nodemailer.createTransport({
