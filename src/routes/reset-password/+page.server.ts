@@ -4,14 +4,27 @@ import { createNodemailerTransport, createPasswordResetToken } from "$lib/server
 import type { Actions } from "./$types";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-    
+export const load: PageServerLoad = async ({ locals }) => {
+    return {
+        user: {
+            email: locals.user?.email
+
+        }
+    }
 };
 
 export const actions: Actions = {
-    default: async({ request }) => {
-        const formData = await request.formData();
-        const email = formData.get("email") as string;
+    default: async({ request, locals }) => {
+
+        let email;
+
+        if (locals.user?.email) {
+            email = locals.user.email;
+        } else {
+            const formData = await request.formData();
+            email = formData.get("email") as string;
+        }
+
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -28,7 +41,7 @@ export const actions: Actions = {
         }
 
         const passwordResetToken = await createPasswordResetToken(existingUser.id);
-        const passwordResetLink = "http://localhost:5173/email-verification/" + passwordResetToken;
+        const passwordResetLink = "http://localhost:5173/reset-password/" + passwordResetToken;
 
         const transporter = createNodemailerTransport();
         transporter.sendMail({

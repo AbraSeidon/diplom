@@ -2,7 +2,7 @@
     export let data;
 </script>
 
-<h1>Welcome to SvelteKit</h1>
+<h1>Welcome to ddisk</h1>
 {#if !data.user}
     <a href="/signup">sign up</a>
     <a href="/login">log in</a>
@@ -18,6 +18,7 @@
             </form>
         {/if}
     </div>
+    <a href="/reset-password">Change password</a>
     <form action="/logout" method="POST">
         <button type="submit">log out</button>
     </form>
