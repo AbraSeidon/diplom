@@ -22,4 +22,5 @@
     <form action="/logout" method="POST">
         <button type="submit">log out</button>
     </form>
+    <a href="/storage">storage</a>
 {/if}
