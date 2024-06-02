@@ -3,6 +3,8 @@ import { prisma } from "./prisma";
 import { TimeSpan, createDate } from "oslo";
 import nodemailer from 'nodemailer';
 import { NODEMAILER_EMAIL, NODEMAILER_PASSWORD } from "$env/static/private";
+import path from "path"
+import * as fs from "node:fs"
 
 export function isValidEmail(email: string): boolean {
 	return /.+@.+/.test(email);
@@ -59,4 +61,17 @@ export function createNodemailerTransport() {
 	});
 
 	return transporter;
+}
+
+export function createDirectory(dirName: string, parentId: string | null): string {
+	let storageDir = path.normalize(path.join(import.meta.dirname, "..", "storage"));
+
+	if (parentId) {
+		storageDir = path.join(storageDir, parentId);
+	}
+    
+	storageDir = path.join(storageDir, dirName);
+	fs.mkdirSync(storageDir);
+
+	return storageDir;
 }
