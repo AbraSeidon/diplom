@@ -87,6 +87,18 @@ export const actions: Actions = {
 		});
 
 		const createdDirectory = createDirectory(userId, null);
+		const fileId = generateIdFromEntropySize(10);
+
+		await prisma.file.create({
+			data: {
+				id: fileId,
+				name: userId,
+				type: "dir",
+				size: 0,
+				path: createdDirectory,
+				userId: userId
+			}
+		})
 
 		redirect(302, "/login");
     }
