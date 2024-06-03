@@ -10,11 +10,12 @@ datasource db {
 model User {
   id                     String                  @id
   email                  String                  @unique
-  EmailVerificationToken EmailVerificationToken?
+  emailVerificationToken EmailVerificationToken?
   email_verified         Boolean                 @default(false)
   password_hash          String
-  PasswordResetToken     PasswordResetToken?
+  passwordResetToken     PasswordResetToken?
   sessions               Session[]
+  files                  File[]
 }
 
 model Session {
@@ -36,4 +37,14 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @unique
   expiresAt DateTime
+}
+
+model File {
+  id     String @id
+  name   String
+  type   String
+  size   Int
+  path   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 }
