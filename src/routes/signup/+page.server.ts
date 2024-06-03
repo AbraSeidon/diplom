@@ -1,11 +1,11 @@
-import { fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { generateIdFromEntropySize } from "lucia";
 import { hash } from "@node-rs/argon2"
 import { prisma } from "$lib/server/prisma";
 import { lucia } from "$lib/server/auth";
 
 import type { Actions, PageServerLoad } from "./$types";
-import { createEmailVerificationToken, createNodemailerTransport, isValidEmail } from "$lib/server/utils";
+import { createDirectory, createEmailVerificationToken, createNodemailerTransport, isValidEmail } from "$lib/server/utils";
 import { NODEMAILER_EMAIL } from "$env/static/private";
 
 
@@ -65,13 +65,19 @@ export const actions: Actions = {
 		const emailVerificationLink = "http://localhost:5173/email-verification/" + emailVerificationToken;
 		
 		const transporter = createNodemailerTransport();
-		transporter.sendMail({
-			from: NODEMAILER_EMAIL,
-            to: email,
-            subject: "Email verification link from ddisk",
-            text: `${emailVerificationLink}`,
-            html: `<a>${emailVerificationLink}</a>`
-		})
+		try {
+
+			transporter.sendMail({
+				from: NODEMAILER_EMAIL,
+				to: email,
+				subject: "Email verification link from ddisk",
+				text: `${emailVerificationLink}`,
+				html: `<a>${emailVerificationLink}</a>`
+			})
+		} catch(e) {
+			console.log(e)
+			throw error(400, "error sending verification mail");
+		}
 
 		const session = await lucia.createSession(userId, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
@@ -79,6 +85,8 @@ export const actions: Actions = {
 			path: ".",
 			...sessionCookie.attributes
 		});
+
+		const createdDirectory = createDirectory(userId, null);
 
 		redirect(302, "/login");
     }
