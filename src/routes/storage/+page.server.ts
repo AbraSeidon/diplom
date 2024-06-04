@@ -47,14 +47,6 @@ export const actions: Actions = {
         const userId = locals.user?.id as string;
         const filePath = path.join(storageDir, userId, file.name);
 
-        console.log("fileName: " + fileName);
-        console.log("fileType: " + fileType);
-        console.log("storageDir: " + storageDir);
-        console.log("userId: " + userId);
-        console.log("filePath: " + filePath);
-
-
-
         if (fileName === "" ||
             fileName === " " ||
             fileType === "" ||
@@ -98,5 +90,33 @@ export const actions: Actions = {
         }
 
         return {message: "done!"}
+    },
+
+    delete: async({ request, locals }) => {
+        if (!locals.user)
+            redirect(302, "/");
+
+        const formData = await request.formData();
+        const fileId = formData.get("id") as string;
+
+        const existingFile = await prisma.file.findUnique({
+            where: {
+                id: fileId,
+            },
+        });
+
+        if(fs.existsSync(existingFile?.path as string))
+            {
+                fs.unlinkSync(existingFile?.path as string);
+
+                await prisma.file.delete({
+                    where: {
+                        id: fileId,
+                    },
+                });
+            }
+
+
+        redirect(302, "/storage");
     }
 };
