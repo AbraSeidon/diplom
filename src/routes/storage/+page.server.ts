@@ -12,12 +12,23 @@ export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user)
         redirect(302, "/");
 
+    const existingFiles = await prisma.file.findMany({
+        where: {
+            userId: locals.user.id,
+            NOT: {
+                type: "dir",
+            },
+        },
+    });
+
+    return {
+        files: existingFiles,
+    }
 
 };
 
 export const actions: Actions = {
-    default: async({ request, locals}) => {
-
+    upload: async({ request, locals}) => {
         if (!locals.user)
             redirect(302, "/");
 
@@ -35,6 +46,13 @@ export const actions: Actions = {
         const fileSize = file.size;
         const userId = locals.user?.id as string;
         const filePath = path.join(storageDir, userId, file.name);
+
+        console.log("fileName: " + fileName);
+        console.log("fileType: " + fileType);
+        console.log("storageDir: " + storageDir);
+        console.log("userId: " + userId);
+        console.log("filePath: " + filePath);
+
 
 
         if (fileName === "" ||
@@ -55,6 +73,7 @@ export const actions: Actions = {
         if (existingFile)
             return fail(400, {message: "File with this name already exists in this directory"});
         
+        
         try {
             await prisma.file.create({
                 data: {
@@ -70,9 +89,14 @@ export const actions: Actions = {
             console.log(e)
             throw error(400, "Loading to database error");
         }
-            
-        fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
-        // сохранить информацию о файле в БД
+
+        try {
+            fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
+        } catch(e) {
+            console.log(e)
+            throw error(400, "Error during saving file in filesystem")
+        }
+
         return {message: "done!"}
     }
 };
