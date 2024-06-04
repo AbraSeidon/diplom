@@ -34,6 +34,7 @@
 		"@lucia-auth/adapter-prisma": "^4.0.1",
 		"@node-rs/argon2": "^1.8.3",
 		"@types/nodemailer": "^6.4.15",
+		"mime": "^4.0.3",
 		"nodemailer": "^6.9.13",
 		"oslo": "^1.2.0"
 	}
