@@ -6,7 +6,8 @@ import { NODEMAILER_EMAIL, NODEMAILER_PASSWORD } from "$env/static/private";
 import path from "path"
 import * as fs from "node:fs"
 
-export let storageDir = path.normalize(path.join(import.meta.dirname, "..", "storage"));
+// export let storageDir = path.normalize(path.join(import.meta.dirname, "..", "storage"));
+export const storageDir = path.join(".", "storage");
 
 export function isValidEmail(email: string): boolean {
 	return /.+@.+/.test(email);
@@ -67,15 +68,16 @@ export function createNodemailerTransport() {
 
 
 export function createDirectory(dirName: string, parentId: string | null): string {
+	let newDirPath = storageDir;
 
 	if (parentId) {
-		storageDir = path.join(storageDir, parentId);
+		newDirPath = path.join(newDirPath, parentId);
 	}
     
-	storageDir = path.join(storageDir, dirName);
-	fs.mkdirSync(storageDir);
+	newDirPath = path.join(newDirPath, dirName);
+	fs.mkdirSync(newDirPath);
 
-	return storageDir;
+	return newDirPath;
 }
 
 export function splitFileName(name: string) {
