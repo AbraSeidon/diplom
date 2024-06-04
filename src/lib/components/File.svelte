@@ -3,9 +3,6 @@
     export let name: string;
     export let type: string;
     export let size: number;
-    export let path: string;
-    export let userId: string;
-
     function handleDownload(e: Event) {
         e.stopPropagation();
         downloadFile(id);
@@ -24,10 +21,12 @@
     }
 </script>
 
-
-
 <div style="border: solid">
     <p>{name}.{type}</p>
     <p>{size} bytes</p>
     <button on:click={handleDownload}>Скачать</button>
+    <form action="?/delete" method="POST">
+        <input type="hidden" name="id" value={id}>
+        <button type="submit">Удалить</button>
+    </form>
 </div>
