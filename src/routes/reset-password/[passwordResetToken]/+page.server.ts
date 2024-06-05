@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params }) => {
     });
 
     if (!existingPasswordResetToken) {
-        throw error(404, "Token does not exist");
+        throw error(404, "Такой страницы не существует");
     }
 
     if (!isWithinExpirationDate(existingPasswordResetToken.expiresAt)) {
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params }) => {
             }
         });
 
-        return error(404, "Token is expired");
+        return error(404, "У ссылки кончился срок годности, создайте новую");
     }
 
 };
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
             });
 
             if (!existingPasswordResetToken) {
-                throw error(404, "Token does not exist");
+                throw error(404, "Такой страницы не существует");
             }
 
             if (!isWithinExpirationDate(existingPasswordResetToken.expiresAt)) {
@@ -61,16 +61,16 @@ export const load: PageServerLoad = async ({ params }) => {
                     }
                 });
 
-                return error(404, "Token is expired");
+                return error(404, "У ссылки кончился срок годности, создайте новую");
             }
 
             if (!newPassword || newPassword.length < 6 || newPassword.length > 255) {
-                errorMessage = "Invalid Password";
+                errorMessage = "Некорректный пароль";
                 return fail(400, { message: errorMessage } );
             }
 
             if (newPassword !== newPasswordConfirmation) {
-                errorMessage = "Passwords are different";
+                errorMessage = "Пароли отличаются";
                 return fail(400, { message: errorMessage} );
             }
 
@@ -98,7 +98,7 @@ export const load: PageServerLoad = async ({ params }) => {
                 },
             });
 
-            throw redirect(302, "/");
+            throw redirect(302, "/login");
 
             
         }

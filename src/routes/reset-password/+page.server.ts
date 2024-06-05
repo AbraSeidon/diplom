@@ -1,8 +1,8 @@
 import { NODEMAILER_EMAIL } from "$env/static/private";
 import { prisma } from "$lib/server/prisma";
-import { createNodemailerTransport, createPasswordResetToken } from "$lib/server/utils";
-import type { Actions } from "./$types";
-import type { PageServerLoad } from "./$types";
+import { createNodemailerTransport, createPasswordResetToken, isValidEmail } from "$lib/server/utils";
+import { fail } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
     return {
@@ -25,6 +25,8 @@ export const actions: Actions = {
             email = formData.get("email") as string;
         }
 
+        if (!isValidEmail(email))
+            return fail(400, {message: "Некорректный email"});
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -47,7 +49,7 @@ export const actions: Actions = {
         transporter.sendMail({
 			from: NODEMAILER_EMAIL,
             to: existingUser.email,
-            subject: "Password reset link from ddisk",
+            subject: "Ссылка для сброса пароля на сервисе ddisk",
             text: `${passwordResetLink}`,
             html: `<a>${passwordResetLink}</a>`
 		})
