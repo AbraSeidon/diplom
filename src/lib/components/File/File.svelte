@@ -3,6 +3,8 @@
     export let name: string;
     export let type: string;
     export let size: number;
+
+
     function handleDownload(e: Event) {
         e.stopPropagation();
         downloadFile(id);
@@ -14,7 +16,7 @@
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', fileId);
+        link.setAttribute('download', name+"."+type);
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -22,9 +24,13 @@
 </script>
 
 <div style="border: solid">
-    <p>{name}.{type}</p>
-    <p>{size} bytes</p>
-    <button on:click={handleDownload}>Скачать</button>
+    {#if type === "dir"}
+        <p>{name}</p>
+    {:else}
+        <p>{name}.{type}</p>
+        <p>{size} bytes</p>
+        <button on:click={handleDownload}>Скачать</button>
+    {/if}
     <form action="?/delete" method="POST">
         <input type="hidden" name="id" value={id}>
         <button type="submit">Удалить</button>

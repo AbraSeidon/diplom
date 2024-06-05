@@ -1,5 +1,5 @@
 <script lang="ts">
-    import File from '$lib/components/File.svelte';
+    import File from '$lib/components/File/File.svelte';
 
     export let data;
     export let form;
