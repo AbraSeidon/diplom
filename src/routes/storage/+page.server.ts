@@ -1,5 +1,5 @@
 import { prisma } from "$lib/server/prisma";
-import {splitFileName, storageDir } from "$lib/server/utils";
+import { splitFileName, storageDir } from "$lib/server/utils";
 import { generateIdFromEntropySize } from "lucia";
 import { error, fail, redirect } from "@sveltejs/kit";
 import path from "path";
@@ -8,16 +8,15 @@ import * as fs from "node:fs"
 import type { Actions, PageServerLoad } from "./$types";
 
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
     if (!locals.user)
         redirect(302, "/");
 
+    const parentId = url.searchParams.get("parentId");
     const existingFiles = await prisma.file.findMany({
         where: {
             userId: locals.user.id,
-            NOT: {
-                type: "dir",
-            },
+            parentId: parentId,
         },
     });
 
@@ -89,7 +88,7 @@ export const actions: Actions = {
             throw error(400, "Error during saving file in filesystem")
         }
 
-        return {message: "done!"}
+        redirect(302, "/storage")
     },
 
     delete: async({ request, locals }) => {
@@ -107,7 +106,11 @@ export const actions: Actions = {
 
         if(fs.existsSync(existingFile?.path as string))
             {
-                fs.unlinkSync(existingFile?.path as string);
+                if (existingFile?.type === "dir"){
+                    fs.rmdirSync(existingFile.path)
+                } else {
+                    fs.unlinkSync(existingFile?.path as string);
+                }
 
                 await prisma.file.delete({
                     where: {
@@ -118,5 +121,5 @@ export const actions: Actions = {
 
 
         redirect(302, "/storage");
-    }
+    },
 };
