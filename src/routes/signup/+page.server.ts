@@ -86,19 +86,7 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		const createdDirectory = createDirectory(userId, null);
-		const fileId = generateIdFromEntropySize(10);
-
-		await prisma.file.create({
-			data: {
-				id: fileId,
-				name: userId,
-				type: "dir",
-				size: 0,
-				path: createdDirectory,
-				userId: userId
-			}
-		})
+		createDirectory(userId, null);
 
 		redirect(302, "/login");
     }
