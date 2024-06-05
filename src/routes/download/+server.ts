@@ -28,6 +28,7 @@ export const GET: RequestHandler = async ({url}) => {
     return new Response(fileContents, {
         headers: {
             "Content-type": fileMIME!,
+            "Content-Disposition": "attachment; filename="+existingFile.name+"."+existingFile.type,
         }
     });
 };
