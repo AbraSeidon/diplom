@@ -40,11 +40,14 @@ model PasswordResetToken {
 }
 
 model File {
-  id     String @id
-  name   String
-  type   String
-  size   Int
-  path   String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  id       String  @id
+  name     String
+  type     String
+  size     Int
+  path     String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  parent   File?   @relation("ParentChildren", fields: [parentId], references: [id])
+  parentId String?
+  children File[]  @relation("ParentChildren")
 }
