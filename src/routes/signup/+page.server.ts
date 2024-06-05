@@ -23,15 +23,15 @@ export const actions: Actions = {
 		const passwordConfirmation = formData.get("passwordConfirmation") as string;
 
 		if (!email || !isValidEmail(email)) {
-			return fail(400, { email, message: "Invalid email" });
+			return fail(400, { email, message: "Некорректный адрес электронной почты" });
 		}
 
 		if (!password || password.length < 6 ||  password.length > 255) {
-			return fail(400, { email, message: "Invalid password" });
+			return fail(400, { email, message: "Некорректный пароль" });
 		}
 
 		if (password !== passwordConfirmation) {
-			return fail(400, { email, message: "Passwords are different" });
+			return fail(400, { email, message: "Пароли не совпадают" });
 		}
 
 		const existingUser = await prisma.user.findUnique({
@@ -41,11 +41,10 @@ export const actions: Actions = {
 		});
 
 		if (existingUser)
-			return fail(400, { email, message: "This email is already taken" });
+			return fail(400, { email, message: "Эта почта уже используется" });
 
-        const userId = generateIdFromEntropySize(10); // 16 characters long
+        const userId = generateIdFromEntropySize(10);
 		const passwordHash = await hash(password, {
-			// recommended minimum parameters
 			memoryCost: 19456,
 			timeCost: 2,
 			outputLen: 32,
@@ -60,7 +59,6 @@ export const actions: Actions = {
             }
 		});
 
-		// Отправлять письмо с ссылкой.
 		const emailVerificationToken = await createEmailVerificationToken(email);
 		const emailVerificationLink = "http://localhost:5173/email-verification/" + emailVerificationToken;
 		
@@ -70,13 +68,13 @@ export const actions: Actions = {
 			transporter.sendMail({
 				from: NODEMAILER_EMAIL,
 				to: email,
-				subject: "Email verification link from ddisk",
+				subject: "Письмо для подтверждения аккаунта ddisk",
 				text: `${emailVerificationLink}`,
 				html: `<a>${emailVerificationLink}</a>`
 			})
 		} catch(e) {
 			console.log(e)
-			throw error(400, "error sending verification mail");
+			throw error(400, "Ошибка при отправке письма для подтверждения аккаунта ddisk");
 		}
 
 		const session = await lucia.createSession(userId, {});
@@ -88,6 +86,6 @@ export const actions: Actions = {
 
 		createDirectory(userId, null);
 
-		redirect(302, "/login");
+		redirect(302, "/storage");
     }
 };

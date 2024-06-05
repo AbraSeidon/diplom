@@ -17,11 +17,11 @@ export const actions: Actions = {
 		const password = formData.get("password") as string;
 
 		if (!email || !isValidEmail(email)) {
-			return fail(400, { email, message: "Invalid email" });
+			return fail(400, { email, message: "Некорректный email" });
 		}
 
 		if (!password || password.length < 6 || password.length > 255) {
-			return fail(400, { email, message: "Invalid password" });
+			return fail(400, { email, message: "Некорректный пароль" });
 		}
 
         const existingUser = await prisma.user.findUnique({
@@ -33,7 +33,7 @@ export const actions: Actions = {
 		if (!existingUser) {
 			return fail(400, {
 				email,
-				message: "Incorrect email or password"
+				message: "Неправильно введён email или пароль"
 			});
 		}
 
@@ -47,7 +47,7 @@ export const actions: Actions = {
 		if (!validPassword) {
 			return fail(400, {
 				email,
-				message: "Incorrect email or password"
+				message: "Неправильно введён email или пароль"
 			});
 		}
 
@@ -58,6 +58,6 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		redirect(302, "/");
+		redirect(302, "/storage");
 	}
 };
