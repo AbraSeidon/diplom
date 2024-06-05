@@ -3,7 +3,7 @@
 
 </script>
 <div class="flex flex-col items-center justify-center h-screen">
-	<div class="flex flex-col items-center justify-center min-w-80">
+	<div class="flex flex-col items-center justify-center w-80 border shadow-lg rounded-lg p-5">
 		<h1 class="text-3xl">Регистрация</h1>
 		<form method="post" class="w-full">
 			<div class="mb-5">
