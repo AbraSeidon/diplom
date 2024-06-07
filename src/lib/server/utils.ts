@@ -87,3 +87,6 @@ export function splitFileName(name: string) {
     return [fileName, fileType]
 }
 
+export function isAllWhitespaces(str: string): boolean {
+	return !/\S/.test(str);
+}
