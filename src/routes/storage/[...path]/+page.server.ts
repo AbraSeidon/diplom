@@ -1,5 +1,5 @@
 import { prisma } from "$lib/server/prisma";
-import { splitFileName, storageDir, isAllWhitespaces } from "$lib/server/utils";
+import { splitFileName, isAllWhitespaces, MAX_SPACE } from "$lib/server/utils";
 import { generateIdFromEntropySize } from "lucia";
 import { error, fail, redirect } from "@sveltejs/kit";
 import path from "path";
@@ -12,7 +12,7 @@ import { existsSync } from "fs";
 export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user)
         redirect(302, "/");
-    
+
     const urlPath = params.path;
 
     const dirs = urlPath.split("/");
@@ -27,6 +27,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
         return {
             files: existingFiles,
+            spaceUsed: locals.user.spaceUsed,
+            maxSpace: MAX_SPACE,
         }
     }
 
@@ -67,30 +69,36 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     })
 
     return {
+        path: urlPath,
         files: existingFiles,
+        spaceUsed: locals.user.spaceUsed,
+        maxSpace: MAX_SPACE,
     }
 
 };
 
 export const actions: Actions = {
-    upload: async({ request, locals}) => {
+    upload: async({ request, locals, params}) => {
         if (!locals.user)
             redirect(302, "/");
+
+        const dirs = params.path.split("/");
 
         const formData = await request.formData();
         const file = formData.get("file") as File;
 
         if (!file)
-            return fail(400, { message: "Choose a file to upload"});
+            return fail(400, { message: "Choose a file to upload" });
 
         if (file.size === 0 && file.type === "application/octet-stream" && file.name == '')
-            return fail(400, {message: "Choose a file to upload"});
+            return fail(400, { message: "Choose a file to upload" });
 
         const fileId = generateIdFromEntropySize(10);
         const [fileName, fileType] = splitFileName(file.name);
         const fileSize = file.size;
         const userId = locals.user?.id as string;
-        const filePath = path.join(storageDir, userId, file.name);
+        const dirPath =  path.join(".", "storage", userId, ...dirs);
+        const filePath = path.join(dirPath, file.name);
 
         if (isAllWhitespaces(fileName as string) ||
             isAllWhitespaces(fileType as string) ||
@@ -108,7 +116,12 @@ export const actions: Actions = {
         if (existingFile)
             return fail(400, {message: "File with this name already exists in this directory"});
         
-        
+        const parentDir = await prisma.file.findFirst({
+            where: {
+                path: dirPath,
+            }
+        });
+
         try {
             await prisma.file.create({
                 data: {
@@ -118,6 +131,7 @@ export const actions: Actions = {
                     size: fileSize,
                     path: filePath,
                     userId: userId,
+                    parentId: parentDir?.id,
                 }
             })
         } catch (e) {
@@ -132,10 +146,10 @@ export const actions: Actions = {
             throw error(400, "Error during saving file in filesystem")
         }
 
-        redirect(302, "/storage")
+        // redirect (302, "/storage/"+params.path)
     },
 
-    delete: async({ request, locals }) => {
+    delete: async({ request, locals, params }) => {
         if (!locals.user)
             redirect(302, "/");
 
@@ -151,7 +165,7 @@ export const actions: Actions = {
         if(fs.existsSync(existingFile?.path as string))
             {
                 if (existingFile?.type === "dir"){
-                    fs.rmdirSync(existingFile.path)
+                    fs.rmSync(existingFile.path, {recursive: true})
                 } else {
                     fs.unlinkSync(existingFile?.path as string);
                 }
@@ -162,9 +176,7 @@ export const actions: Actions = {
                     },
                 });
             }
-
-
-        redirect(302, "/storage");
+        // redirect(302, "/storage/"+params.path);
     },
     createDir: async(event) => {
         if (!event.locals.user)
@@ -225,6 +237,8 @@ export const actions: Actions = {
                 fs.rmdirSync(creatingPath);
             redirect(302, "/storage");
         }
+
+        // redirect(302, "/storage/"+event.params.path);
         
     }
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+
     export let data;
 </script>
 
@@ -20,7 +21,8 @@
        </div>
        <div class="mb-5">
             <p class="font-medium">Использовано места</p>
-            <span>## байтов из ### байтов</span>
+            <p>{data.user.spaceUsed} байтов из {data.maxSpace} байтов</p>
+            <progress id="spaceProgress" max={data.maxSpace} value={data.user.spaceUsed}></progress>
        </div>
        <div class="mb-5">
             <a href="/reset-password" class="button bg-black text-white rounded-md py-2 px-3 text-center">Сменить пароль</a>
@@ -32,9 +34,3 @@
        </div>
 	</div>
 </div>
-
-<style>
-    *{
-        /* border: solid green; */
-    }
-</style>

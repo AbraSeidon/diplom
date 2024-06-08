@@ -17,7 +17,7 @@
 
 <div class="flex flex-col items-center justify-center h-screen">
 	<div class="flex flex-col items-center justify-center w-80 border shadow-lg rounded-lg p-5">
-		<h1 class="text-3xl">Вход</h1>
+		<h1 class="text-3xl mb-5">Вход</h1>
 		<form method="post" class="w-full">
 			<div class="mb-5">
 				<label for="email" class="block font-medium px-2">Email</label>
