@@ -61,16 +61,13 @@ export const load: PageServerLoad = async ({ locals, params }) => {
         },
     });
 
-
-    const existingFiles = await prisma.file.findMany({
-        where: {
-            parentId: existingDir?.id
-        }
-    })
-
     return {
         path: urlPath,
-        files: existingFiles,
+        files: await prisma.file.findMany({
+            where: {
+                parentId: existingDir?.id
+            }
+        }),
         spaceUsed: locals.user.spaceUsed,
         maxSpace: MAX_SPACE,
     }
@@ -104,7 +101,7 @@ export const actions: Actions = {
             isAllWhitespaces(fileType as string) ||
             fileSize == 0
         ) {
-            return fail(400, { message: "Invalid file name" })
+            return fail(400, { message: "Некорректное имя файла" })
         }
 
         const existingFile = await prisma.file.findFirst({
@@ -114,13 +111,23 @@ export const actions: Actions = {
         });
 
         if (existingFile)
-            return fail(400, {message: "File with this name already exists in this directory"});
+            return fail(400, {message: "Файл с таким именем уже существует"});
+
+        if (locals.user.spaceUsed + fileSize >= MAX_SPACE)
+            return fail(400, {message: "Файл слишком большой"})
         
         const parentDir = await prisma.file.findFirst({
             where: {
                 path: dirPath,
             }
         });
+
+        try {
+            fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
+        } catch(e) {
+            console.log(e)
+            throw error(400, "Ошибка во время сохранения файла")
+        }
 
         try {
             await prisma.file.create({
@@ -136,17 +143,35 @@ export const actions: Actions = {
             })
         } catch (e) {
             console.log(e)
-            throw error(400, "Loading to database error");
+            throw error(400, "Ошибка во время сохранения файла");
+        }
+        
+        const spaceUsedArray = await prisma.file.groupBy({
+            by: 'userId',
+            where: {
+                userId: locals.user.id,
+            },
+            _sum: {
+                size: true,
+            },
+        });
+        
+        let spaceUsed = 0;
+
+        if (spaceUsedArray.length !== 0) {
+            spaceUsed = spaceUsedArray[0]._sum.size as number;
         }
 
-        try {
-            fs.writeFileSync(filePath, Buffer.from(await file.arrayBuffer()));
-        } catch(e) {
-            console.log(e)
-            throw error(400, "Error during saving file in filesystem")
-        }
+        await prisma.user.update({
+            where: {
+                id: locals.user.id,
+            },
+            data: {
+                spaceUsed: spaceUsed,
+            }
+        })
 
-        // redirect (302, "/storage/"+params.path)
+        redirect (302, "/storage/"+params.path)
     },
 
     delete: async({ request, locals, params }) => {
@@ -167,7 +192,7 @@ export const actions: Actions = {
                 if (existingFile?.type === "dir"){
                     fs.rmSync(existingFile.path, {recursive: true})
                 } else {
-                    fs.unlinkSync(existingFile?.path as string);
+                    fs.unlinkSync(existingFile?.path as string); 
                 }
 
                 await prisma.file.delete({
@@ -175,8 +200,36 @@ export const actions: Actions = {
                         id: fileId,
                     },
                 });
+
+                const spaceUsedArray = await prisma.file.groupBy({
+                    by: 'userId',
+                    where: {
+                        userId: locals.user.id,
+                    },
+                    _sum: {
+                        size: true,
+                    },
+                });
+                
+                let spaceUsed = 0;
+
+                if (spaceUsedArray.length !== 0) {
+                    spaceUsed = spaceUsedArray[0]._sum.size as number;
+                }
+
+                await prisma.user.update({
+                    where: {
+                        id: locals.user.id,
+                    },
+                    data: {
+                        spaceUsed: spaceUsed,
+                    }
+                })
+
+                
             }
-        // redirect(302, "/storage/"+params.path);
+
+        redirect(302, "/storage/"+params.path);
     },
     createDir: async(event) => {
         if (!event.locals.user)
@@ -203,7 +256,11 @@ export const actions: Actions = {
         const creatingPath = path.join(".", "storage", event.locals.user.id, ...dirs, dirName)
 
         try {
-            fs.mkdirSync(creatingPath);
+            if (!existsSync(creatingPath)){
+                fs.mkdirSync(creatingPath);
+            } else {
+                return fail(400, {message: "Папка с таким названием уже есть"})
+            }
         } catch(e) {
             console.log(e);
             redirect(302, "/storage");
@@ -238,7 +295,6 @@ export const actions: Actions = {
             redirect(302, "/storage");
         }
 
-        // redirect(302, "/storage/"+event.params.path);
-        
+        redirect(302, "/storage/"+event.params.path);
     }
 };

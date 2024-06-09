@@ -29,7 +29,7 @@
        </div>
        <div>
             <form method="POST" action="/logout">
-                <button type="submit" class="button bg-black text-white rounded-md py-2 px-3 text-center">Выйти</button>
+                <button type="submit" class="button bg-red-600 text-white rounded-md py-2 px-3 text-center">Выйти</button>
             </form>
        </div>
 	</div>
