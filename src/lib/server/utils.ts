@@ -7,7 +7,7 @@ import path from "path"
 import * as fs from "node:fs"
 
 // export let storageDir = path.normalize(path.join(import.meta.dirname, "..", "storage"));
-export const MAX_SPACE = 60*1024*1024;
+export const MAX_SPACE = 10*1024*1024;
 export const storageDir = path.join(".", "storage");
 
 export function isValidEmail(email: string): boolean {

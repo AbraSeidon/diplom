@@ -171,7 +171,7 @@ export const actions: Actions = {
             }
         })
 
-        redirect (302, "/storage/"+params.path)
+        redirect (302, "/storage/"+encodeURIComponent(params.path))
     },
 
     delete: async({ request, locals, params }) => {
@@ -229,7 +229,7 @@ export const actions: Actions = {
                 
             }
 
-        redirect(302, "/storage/"+params.path);
+        redirect(302, "/storage/"+encodeURIComponent(params.path));
     },
     createDir: async(event) => {
         if (!event.locals.user)
@@ -294,7 +294,6 @@ export const actions: Actions = {
                 fs.rmdirSync(creatingPath);
             redirect(302, "/storage");
         }
-
-        redirect(302, "/storage/"+event.params.path);
+        redirect(302, "/storage/"+encodeURIComponent(event.params.path));
     }
 };
