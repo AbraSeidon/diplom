@@ -21,8 +21,8 @@
        </div>
        <div class="mb-5">
             <p class="font-medium">Использовано места</p>
-            <p>{data.user.spaceUsed} байтов из {data.maxSpace} байтов</p>
-            <progress id="spaceProgress" max={data.maxSpace} value={data.user.spaceUsed}></progress>
+            <p>{(data.user.spaceUsed/1024/1024).toFixed(2)} MB из {data.maxSpace/1024/1024} MB</p>
+            <progress id="spaceProgress" max={data.maxSpace} value={data.user.spaceUsed} class="w-full"></progress>
        </div>
        <div class="mb-5">
             <a href="/reset-password" class="button bg-black text-white rounded-md py-2 px-3 text-center">Сменить пароль</a>

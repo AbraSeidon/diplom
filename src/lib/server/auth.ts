@@ -9,7 +9,8 @@ export const lucia = new Lucia(adapter, {
 	sessionCookie: {
 		attributes: {
 			// `true` when using HTTPS
-			secure: !dev
+			secure: !dev,
+			sameSite: "strict",
 		}
 	},
 	// Здесь мы указываем, какие поля о пользователе мы хотим вернуть после валидации в хуке c помощью функции lucia, 

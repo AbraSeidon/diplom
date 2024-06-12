@@ -7,6 +7,7 @@
     export let type: string;
     export let size: number;
     
+    
     let fileUrl: string; 
 
     onMount(() => fileUrl = window.location.href.split("?")[0] + "/" + name);

@@ -4,7 +4,7 @@
 </script>
 
 <div class="flex flex-col h-screen">
-    <div class="bg-gray-300 flex justify-between pr-10 pl-10 md:pl-5 items-center py-5">
+    <div class="bg-slate-400 flex justify-between pr-10 pl-10 md:pl-5 items-center py-5">
         <div>
             <a href="/" class="text-5xl font-medium">ddisk</a>
         </div>
