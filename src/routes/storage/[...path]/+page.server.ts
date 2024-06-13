@@ -9,7 +9,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { existsSync } from "fs";
 
 
-export const load: PageServerLoad = async ({ locals, params, url }) => {
+export const load: PageServerLoad = async ({ locals, params }) => {
     if (!locals.user)
         redirect(302, "/");
 
