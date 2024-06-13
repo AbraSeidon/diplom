@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-    default: async({ request, locals }) => {
+    default: async({ request, locals, url }) => {
 
         let email;
 
@@ -42,8 +42,9 @@ export const actions: Actions = {
             return { success: true }
         }
 
+        const origin = url.origin;
         const passwordResetToken = await createPasswordResetToken(existingUser.id);
-        const passwordResetLink = "http://localhost:5173/reset-password/" + passwordResetToken;
+        const passwordResetLink = origin+"/reset-password/"+passwordResetToken;
 
         const transporter = createNodemailerTransport();
         transporter.sendMail({

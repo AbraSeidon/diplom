@@ -154,7 +154,7 @@
             {/each}
         </div>
         {:else }
-        <div class="flex flex-row flex-wrap gap-5 mx-10">    
+        <div class="flex flex-row flex-wrap mx-10 gap-5 sm:justify-normal justify-center">    
             {#each searched as file (file.id)}
                 <FileTile id={file.id} name={file.name} type={file.type} size={file.size} />
             {:else }

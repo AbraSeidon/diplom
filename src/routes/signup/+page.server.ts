@@ -60,7 +60,7 @@ export const actions: Actions = {
 		});
 
 		const emailVerificationToken = await createEmailVerificationToken(email);
-		const emailVerificationLink = "http://localhost:5173/email-verification/" + emailVerificationToken;
+		const emailVerificationLink = origin+"/email-verification/"+emailVerificationToken;
 		
 		const transporter = createNodemailerTransport();
 		try {
