@@ -13,7 +13,6 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
     if (!locals.user)
         redirect(302, "/");
 
-    console.log(url);
     const urlPath = params.path;
 
     const dirs = urlPath.split("/");
