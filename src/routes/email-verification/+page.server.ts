@@ -18,7 +18,7 @@ export const actions: Actions = {
 		
         try {
             const transporter = createNodemailerTransport();
-            transporter.sendMail({
+            await transporter.sendMail({
                 from: NODEMAILER_EMAIL,
                 to: locals.user.email,
                 subject: "Письмо для подтверждения аккаунта ddisk",

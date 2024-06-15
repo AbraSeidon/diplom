@@ -46,14 +46,18 @@ export const actions: Actions = {
         const passwordResetToken = await createPasswordResetToken(existingUser.id);
         const passwordResetLink = origin+"/reset-password/"+passwordResetToken;
 
-        const transporter = createNodemailerTransport();
-        transporter.sendMail({
-			from: NODEMAILER_EMAIL,
-            to: existingUser.email,
-            subject: "Ссылка для сброса пароля на сервисе ddisk",
-            text: `${passwordResetLink}`,
-            html: `<a>${passwordResetLink}</a>`
-		})
+        try {
+            const transporter = createNodemailerTransport();
+            await transporter.sendMail({
+                from: NODEMAILER_EMAIL,
+                to: existingUser.email,
+                subject: "Ссылка для сброса пароля на сервисе ddisk",
+                text: `${passwordResetLink}`,
+                html: `<a>${passwordResetLink}</a>`
+            })
+        } catch(e) {
+            console.log(e);
+        }
         
         return { success: true }
     }
