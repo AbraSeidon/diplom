@@ -1,19 +1,6 @@
 <script lang="ts">
 	export let form;
 </script>
-<!-- 
-<h1>Log in</h1>
-<form method="post">
-	<label for="email">Email</label>
-	<input name="email" id="email" value={form?.email ?? ''}/><br />
-	<label for="password">Password</label>
-	<input type="password" name="password" id="password" /><br />
-	{#if form?.message}
-		<p>{form?.message}</p>
-	{/if}
-	<button>Continue</button>
-</form>
-<a href="/reset-password">Forgot the password</a> -->
 
 <div class="flex flex-col items-center justify-center h-screen">
 	<div class="flex flex-col items-center justify-center w-80 border shadow-lg rounded-lg p-5">
