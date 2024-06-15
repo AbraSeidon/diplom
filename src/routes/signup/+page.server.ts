@@ -59,6 +59,7 @@ export const actions: Actions = {
             }
 		});
 
+		const origin = event.url.origin;
 		const emailVerificationToken = await createEmailVerificationToken(email);
 		const emailVerificationLink = origin+"/email-verification/"+emailVerificationToken;
 		
