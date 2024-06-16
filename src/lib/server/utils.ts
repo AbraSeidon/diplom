@@ -7,7 +7,7 @@ import path from "path"
 import * as fs from "node:fs"
 
 export const MAX_SPACE = 10*1024*1024;
-const storageDir = path.join(".", "storage");
+const storageDir = path.join("storage");
 
 export function isValidEmail(email: string): boolean {
 	return /.+@.+/.test(email);
@@ -75,7 +75,7 @@ export function createDirectory(dirName: string, parentId: string | null): strin
 	}
     
 	newDirPath = path.join(newDirPath, dirName);
-	fs.mkdirSync(path.join(process.cwd(),"storage",dirName), { recursive: true});
+	fs.mkdirSync(path.join(".output", newDirPath));
 
 	return newDirPath;
 }
