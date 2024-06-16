@@ -75,7 +75,7 @@ export function createDirectory(dirName: string, parentId: string | null): strin
 	}
     
 	newDirPath = path.join(newDirPath, dirName);
-	fs.mkdirSync(path.join(".output", newDirPath));
+	fs.mkdirSync(path.join(".output", newDirPath), { recursive: true});
 
 	return newDirPath;
 }
