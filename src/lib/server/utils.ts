@@ -7,7 +7,7 @@ import path from "path"
 import * as fs from "node:fs"
 
 export const MAX_SPACE = 10*1024*1024;
-const storageDir = path.join("storage");
+const storageDir = path.join(process.cwd(),"storage");
 
 export function isValidEmail(email: string): boolean {
 	return /.+@.+/.test(email);
